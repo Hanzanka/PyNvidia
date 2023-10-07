@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
 from urllib.request import urlretrieve
 from gpu.gpu import GPU
-from pathlib import Path
+import os
 from options.options import download_path
 
 
@@ -19,13 +19,10 @@ class NvidiaWebScraper:
     def download_installer(self, reporthook=None) -> None:
         self.__open_search_page()
         link = self.__get_download_link()
-        download_location = Path(download_path)
-        if not download_location.exists():
-            download_location.mkdir()
-        download_location = (
-            str(download_location.resolve()) + f"/{link.split('/')[4]}.exe"
-        )
-        if Path(download_location).exists():
+        if not os.path.isdir(download_path):
+            os.makedirs(download_path)
+        download_location = download_path + f"{link.split('/')[4]}.exe"
+        if os.path.isfile(download_location):
             print("File already exists. Skipping download...")
             return
         urlretrieve(url=link, filename=download_location, reporthook=reporthook)
@@ -80,9 +77,6 @@ class NvidiaWebScraper:
         return self.__webdriver.find_element(
             by=By.XPATH, value='//*[@id="mainContent"]/table/tbody/tr/td/a'
         ).get_attribute(name="href")
-
-    def __update_progress(self, block_num, block_size, total_size) -> None:
-        self.__update_frame.update_progress_bar(block_num * block_size / total_size)
 
 
 if __name__ == "__main__":

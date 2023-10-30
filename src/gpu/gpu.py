@@ -26,7 +26,7 @@ class GPU:
 
         self.__product = output.split(", ")[0][7:]
 
-        self.__driver_version = output.split(", ")[1]
+        self.__driver_version = float(output.split(", ")[1])
 
         self.__vram = str(int(int(output.split(", ")[2]) / 1024)) + " GB"
 

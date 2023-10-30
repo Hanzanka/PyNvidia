@@ -17,7 +17,7 @@ def locate_7zip() -> str:
     try:
         with OpenKey(HKEY_LOCAL_MACHINE, r"SOFTWARE\7-Zip") as key:
             try:
-                config["paths"]["sevenz_path"] = (
+                config["paths"]["sevenz"] = (
                     QueryValueEx(key, "Path")[0].replace("\\", "/") + "7z.exe"
                 )
             except FileNotFoundError:
@@ -33,9 +33,11 @@ def locate_7zip() -> str:
 
 
 def extract_files() -> None:
-    from options.options import download_path, sevenz_path
     import os
     import subprocess
+
+    download_path = get_path("download")
+    sevenz_path = get_path("sevenz")
 
     folder_path = download_path + str(
         max([float(os.path.splitext(file)[0]) for file in os.listdir(download_path)])
@@ -56,11 +58,29 @@ def extract_files() -> None:
     os.remove(driver_path)
 
 
-def install_driver(driver_path: str) -> None:
+def get_path(key: str) -> str:
+    import json
+    import pathlib
+
+    with open(
+        str(pathlib.Path(__file__).parents[1]) + "/config.json", "r"
+    ) as config_file:
+        return json.load(config_file)["paths"][key]
+
+
+def install_driver(driver_version: str) -> None:
     import subprocess
 
     try:
-        subprocess.Popen(args=[driver_path])
+        subprocess.Popen(
+            args=[
+                f"{get_path('download')}{driver_version}/setup.exe",
+                "Display.Driver",
+                "Display.PhysX",
+                "HDAudio.Driver",
+                "-s",
+            ]
+        )
     except Exception:
         pass
 

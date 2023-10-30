@@ -3,7 +3,12 @@ import tkinter
 from scraper.scraper import NvidiaWebScraper
 from threading import Lock, Thread
 from time import sleep
-from utils.utils import extract_files, install_driver, get_path
+from utils.utils import (
+    extract_files,
+    install_driver,
+    get_path,
+    delete_unfinished_download,
+)
 from ui.fonts import update_panel_font
 import os
 
@@ -11,7 +16,6 @@ import os
 class UpdateFrame(customtkinter.CTkFrame):
     def __init__(self, master, driver_downloader: NvidiaWebScraper) -> None:
         super().__init__(master=master, fg_color="#0b0b0b")
-        self.pack(fill=tkinter.X, side=tkinter.BOTTOM, padx=10, pady=10)
 
         self.__driver_downloader = driver_downloader
 
@@ -32,15 +36,19 @@ class UpdateFrame(customtkinter.CTkFrame):
             side=tkinter.RIGHT, anchor=tkinter.SE, padx=(10, 0)
         )
 
-        self.__infoframe = customtkinter.CTkFrame(master=self, fg_color="#0b0b0b")
+        self.__info_frame = customtkinter.CTkFrame(master=self, fg_color="#0b0b0b")
 
         self.__update_label = customtkinter.CTkLabel(
-            master=self.__infoframe, corner_radius=5, font=update_panel_font
+            master=self.__info_frame,
+            corner_radius=0,
+            font=update_panel_font,
+            justify=tkinter.LEFT,
+            anchor=tkinter.W,
         )
-        self.__update_label.pack(anchor=tkinter.W, side=tkinter.TOP)
+        self.__update_label.pack(anchor=tkinter.W, side=tkinter.TOP, padx=5)
 
         self.__download_bar = customtkinter.CTkProgressBar(
-            master=self.__infoframe,
+            master=self.__info_frame,
             corner_radius=5,
             fg_color="#0b0b0b",
             progress_color="#76b900",
@@ -51,7 +59,7 @@ class UpdateFrame(customtkinter.CTkFrame):
         self.__download_bar.pack(expand=True, fill=tkinter.X, side=tkinter.LEFT)
 
         self.__download_button = customtkinter.CTkButton(
-            master=self.__infoframe,
+            master=self.__info_frame,
             corner_radius=5,
             fg_color="#76b900",
             text_color="#000000",
@@ -62,7 +70,7 @@ class UpdateFrame(customtkinter.CTkFrame):
         )
 
         self.__install_button = customtkinter.CTkButton(
-            master=self.__infoframe,
+            master=self.__info_frame,
             corner_radius=5,
             fg_color="#76b900",
             text_color="#000000",
@@ -90,9 +98,24 @@ class UpdateFrame(customtkinter.CTkFrame):
     def __check_for_updates(self) -> None:
         self.__update_label.configure(text="Checking For Updates")
         self.__download_bar.start()
-        self.__infoframe.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
+        self.__download_bar.pack(expand=True, fill=tkinter.X, side=tkinter.LEFT)
+        self.__info_frame.pack(side=tkinter.LEFT, expand=True, fill=tkinter.X)
 
-        update_available, driver_version = self.__driver_downloader.check_for_updates()
+        try:
+            (
+                update_available,
+                driver_version,
+            ) = self.__driver_downloader.check_for_updates()
+        except Exception:
+            self.__download_bar.stop()
+            self.__download_bar.pack_forget()
+            self.__update_label.configure(
+                text="Check For Updates Failed\nCheck Your Internet Connection"
+            )
+            self.__check_for_updates_button.configure(
+                state="normal", fg_color="#76b900"
+            )
+            return
 
         if not update_available:
             self.__update_label.configure(text="No Updates Available")
@@ -116,10 +139,26 @@ class UpdateFrame(customtkinter.CTkFrame):
     def __download_update(self) -> None:
         self.__download_button.pack_forget()
         self.__update_label.configure(text="Downloading Installer")
+        self.__update_label.pack_configure(pady=0)
         self.__download_bar.configure(mode="determinate")
         self.__download_bar.set(0)
         self.__download_bar.pack(expand=True, fill=tkinter.X, side=tkinter.LEFT)
-        self.__driver_downloader.download_installer(reporthook=self.__update_progress)
+
+        try:
+            self.__driver_downloader.download_installer(
+                reporthook=self.__update_progress
+            )
+        except Exception:
+            self.__download_bar.stop()
+            self.__download_bar.pack_forget()
+            delete_unfinished_download(self.__downloaded_driver_version)
+            self.__update_label.configure(
+                text="Download Failed\nCheck Your Internet Connection"
+            )
+            self.__update_label.pack_configure(pady=(0, 8))
+            self.__download_button.pack(expand=True, fill=tkinter.X, side=tkinter.LEFT)
+            return
+
         self.__update_label.configure(text="Extracting Files")
         self.__download_bar.configure(mode="indeterminate")
         self.__download_bar.start()
@@ -143,7 +182,7 @@ class UpdateFrame(customtkinter.CTkFrame):
 
     def __set_bar_progress(self, value) -> None:
         self.__download_bar.set(value=value)
-        sleep(0.75)
+        sleep(0.25)
         self.__update_lock.release()
 
     def __update_progress(self, block_num, block_size, total_size) -> None:

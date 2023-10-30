@@ -5,34 +5,36 @@ from selenium.webdriver.common.by import By
 from urllib.request import urlretrieve
 from gpu.gpu import GPU
 import os
-from options.options import download_path
+from utils.utils import get_path
 
 
 class NvidiaWebScraper:
     def __init__(self, gpu: GPU) -> None:
         options = Options()
         options.headless = True
+        options.add_argument("--blink-settings=imagesEnabled=false")
         self.__webdriver = Edge(options=options)
         self.__search_page = "https://www.nvidia.com/download/index.aspx"
         self.__gpu = gpu
-
+        self.__download_path = get_path("download")
+        
     def download_installer(self, reporthook=None) -> None:
         self.__open_search_page()
         link = self.__get_download_link()
-        if not os.path.isdir(download_path):
-            os.makedirs(download_path)
-        download_location = download_path + f"{link.split('/')[4]}.exe"
-        if os.path.isfile(download_location):
+        if not os.path.isdir(self.__download_path):
+            os.makedirs(self.__download_path)
+        download_location = self.__download_path + f"{link.split('/')[4]}.exe"
+        if os.path.isfile(download_location) or os.path.isdir(download_location[:-4]):
             print("File already exists. Skipping download...")
             return
         urlretrieve(url=link, filename=download_location, reporthook=reporthook)
 
-    def check_for_updates(self) -> bool:
+    def check_for_updates(self) -> tuple:
         self.__open_search_page()
-        driver_version = self.__webdriver.find_element(
+        driver_version = float(self.__webdriver.find_element(
             by=By.XPATH, value='//*[@id="tdVersion"]'
-        ).text
-        return self.__gpu.driver_version != driver_version
+        ).text.split("  ")[0])
+        return self.__gpu.driver_version != driver_version, driver_version
 
     def __open_search_page(self) -> None:
         self.__webdriver.get(self.__search_page)

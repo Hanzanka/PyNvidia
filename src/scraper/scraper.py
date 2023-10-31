@@ -24,9 +24,6 @@ class NvidiaWebScraper:
         if not os.path.isdir(self.__download_path):
             os.makedirs(self.__download_path)
         download_location = self.__download_path + f"{link.split('/')[4]}.exe"
-        if os.path.isfile(download_location) or os.path.isdir(download_location[:-4]):
-            print("File already exists. Skipping download...")
-            return
         urlretrieve(url=link, filename=download_location, reporthook=reporthook)
 
     def check_for_updates(self) -> tuple:

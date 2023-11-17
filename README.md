@@ -13,7 +13,7 @@ In addition, it features a monitoring system that keeps track of the state of yo
 - Driver Updates: Automatically update your with a few clicks.
 - GPU Monitoring: Display GPU statistics in real-time.
 
-![Screenshot](https://github.com/Hanzanka/PyNvidia/blob/main/example.png?raw=true)
+![Home Screen](https://github.com/Hanzanka/PyNvidia/blob/main/homescreen.png?raw=true)
 
 ## Dependencies
 - [CustomTkinter](https://github.com/tomschimansky/customtkinter)

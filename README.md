@@ -14,3 +14,30 @@ In addition, it features a monitoring system that keeps track of the state of yo
 - GPU Monitoring: Display GPU statistics in real-time.
 
 ![Screenshot](https://github.com/Hanzanka/PyNvidia/blob/main/example.png?raw=true)
+
+## Dependencies
+- [CustomTkinter](https://github.com/tomschimansky/customtkinter)
+- Tkinter
+- [Selenium](https://pypi.org/project/selenium/)
+- [pyuac](https://pypi.org/project/pyuac/)
+- [Fira Code](https://fonts.google.com/specimen/Fira+Code)(Probably will be changed or to be automatically installed with the program)
+
+
+## Installation
+The repository is in early development, so the program wouldn't work by directly cloning the repository. However if you still want to get it work, here is the steps to get it work:
+
+1. Clone the repository
+```bash
+    git clone https://github.com/Hanzanka/PyNvidia.git
+```
+2. Create a config.json -file to `src/`
+
+3. Add these lines to config.json:
+```json
+    {
+        "paths": {
+            "program": "(path to where the repository cloned)",
+            "download": "(path to where the driver files are downloaded)"
+        }
+    }
+```

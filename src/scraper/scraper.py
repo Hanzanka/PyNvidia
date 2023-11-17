@@ -77,6 +77,9 @@ class NvidiaWebScraper:
             by=By.XPATH, value='//*[@id="mainContent"]/table/tbody/tr/td/a'
         ).get_attribute(name="href")
 
+    def quit(self) -> None:
+        self.__webdriver.quit()
+    
 
 if __name__ == "__main__":
     gpu = GPU()

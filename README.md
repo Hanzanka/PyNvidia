@@ -28,16 +28,16 @@ The repository is in early development, so the program wouldn't work by directly
 
 1. Clone the repository
 ```bash
-    git clone https://github.com/Hanzanka/PyNvidia.git
+git clone https://github.com/Hanzanka/PyNvidia.git
 ```
 2. Create a config.json -file to `src/`
 
 3. Add these lines to config.json:
 ```json
-    {
-        "paths": {
-            "program": "(path to where the repository cloned)",
-            "download": "(path to where the driver files are downloaded)"
-        }
+{
+    "paths": {
+        "program": "(path to where the repository cloned)",
+        "download": "(path to where the driver files are downloaded)"
     }
+}
 ```

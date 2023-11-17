@@ -2,7 +2,6 @@ import customtkinter
 import tkinter
 from gpu.gpu import GPU
 from ui.fonts import update_panel_font
-from threading import Thread, Event, Timer
 
 
 class MonitorFrame(customtkinter.CTkFrame):
@@ -76,32 +75,21 @@ class MonitorFrame(customtkinter.CTkFrame):
 
         twin_frame_2.pack(fill=tkinter.X, pady=5)
 
-        timer = Timer(function=self.__update_data, interval=0.5)
-        timer.daemon = True
-        timer.start()
+        self.after(func=self.__update_data, ms=500)
 
     def __update_data(self) -> None:
-        try:
-            data = self.__gpu.get_sensor_data()
-            event = Event()
-            threads = []
-            
-            threads.append(Thread(target=self.__util.update, args=[data["utilization"], event]))
-            threads.append(Thread(target=self.__temp.update, args=[data["temperature"], event]))
-            threads.append(Thread(target=self.__clock.update, args=[data["clock"], event]))
-            threads.append(Thread(target=self.__vram.update, args=[data["vram_gb"], event]))
-            threads.append(Thread(target=self.__power.update, args=[data["power"], event]))
-            threads.append(Thread(target=self.__fan.update, args=[data["fan"], event]))
-            for thread in threads:
-                thread.start()
-            event.set()
-            for thread in threads:
-                thread.join()
-        except Exception as e:
-            print(e)
-        timer = Timer(function=self.__update_data, interval=0.5)
-        timer.daemon = True
-        timer.start()
+        
+        data = self.__gpu.get_sensor_data()
+        
+        self.__util.update(value=data["utilization"])
+        self.__temp.update(value=data["temperature"])
+        self.__clock.update(value=data["clock"])
+        self.__util.update(value=data["utilization"])
+        self.__vram.update(value=data["vram_gb"])
+        self.__power.update(value=data["power"])
+        self.__fan.update(value=data["fan"])
+        
+        self.after(func=self.__update_data, ms=500)
 
 
 class MonitorPropertyFrame(customtkinter.CTkFrame):
@@ -146,10 +134,6 @@ class MonitorPropertyFrame(customtkinter.CTkFrame):
         )
         self.__label_max.pack(side=tkinter.LEFT)
 
-    def update(self, value: int | float, event: Event) -> None:
-        try:
-            event.wait()
-            self.__label_current.configure(text=str(value) + self.__unit)
-            self.__bar.set(value=value / self.__max_value)
-        except Exception as e:
-            print(e)
+    def update(self, value: int | float) -> None:
+        self.__label_current.configure(text=str(value) + self.__unit)
+        self.__bar.set(value=value / self.__max_value)

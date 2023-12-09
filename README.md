@@ -9,6 +9,8 @@ In addition, it features a monitoring system that keeps track of the state of yo
 - GPU Monitoring: Real-time monitoring of GPU state.
 
 ## UI
+### Note
+- The UI will be remaked with PyQT instead of Tkinter.
 ### Home Screen
 - Driver Updates: Automatically update your with a few clicks.
 - GPU Monitoring: Display GPU statistics in real-time.

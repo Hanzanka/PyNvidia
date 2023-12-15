@@ -1,7 +1,7 @@
 from urllib.request import urlretrieve, urlopen
 from src.gpu.gpu import GPU
 import os
-from src.utils.utils import get_path
+from src.utils.utils import get_path, extract_driver
 from PyQt6.QtCore import pyqtSignal, pyqtSlot, QObject
 from threading import Lock, Timer
 from src.utils.utils import delete_unfinished_download, get_nv_search_keys
@@ -80,7 +80,7 @@ class NvidiaWebScraper(QObject):
             self.download_error_signal.emit()
             delete_unfinished_download(driver_version=self.__available_driver_version)
             return
-        self.download_complete_signal.emit(None)
+        self.download_complete_signal.emit()
 
     def __update_download_progress(self, block_num, block_size, total_size) -> None:
         if self.__report_lock.acquire(blocking=False):
@@ -99,7 +99,17 @@ class NvidiaWebScraper(QObject):
             Timer(interval=0.5, function=self.__report_lock.release).start()
 
         if block_num * block_size >= total_size:
+            self.download_signal.emit(
+                100,
+                total_size / 1024**2,
+                total_size / 1024**2,
+                0,
+            )
             self.download_complete_signal.emit(True)
+    
+    def extract_driver(self) -> None:
+        try:
+            
 
 
 if __name__ == "__main__":

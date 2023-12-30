@@ -3,7 +3,8 @@ from src.gpu.gpu import GPU
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
 from src.ui_qt.update_frame import UpdateFrame
-from src.scraper.scraper import NvidiaWebScraper
+from src.ui_qt.monitor_frame import MonitorFrame
+from src.driver_manager.driver_manager import NvidiaDriverManager
 
 
 class HomeFrame(QFrame):
@@ -14,11 +15,12 @@ class HomeFrame(QFrame):
         )
 
         self.__gpu = GPU(laptop_dev=False)
-        self.__scraper = NvidiaWebScraper(self.__gpu)
+        self.__driver_manager = NvidiaDriverManager(self.__gpu)
 
         self.__layout = QVBoxLayout()
         self.__layout.setContentsMargins(7, 7, 7, 7)
-        
+        self.__layout.setSpacing(7)
+
         font = QFont("Fira Code", 20, QFont.Weight.Bold)
 
         self.__title = QLabel(text=self.__gpu.full_name)
@@ -29,7 +31,10 @@ class HomeFrame(QFrame):
 
         self.__layout.addStretch()
 
-        self.__update_frame = UpdateFrame(scraper=self.__scraper)
+        self.__monitor_frame = MonitorFrame(gpu=self.__gpu)
+        self.__layout.addWidget(self.__monitor_frame)
+
+        self.__update_frame = UpdateFrame(scraper=self.__driver_manager)
         self.__layout.addWidget(self.__update_frame)
 
         self.setLayout(self.__layout)

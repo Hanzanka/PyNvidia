@@ -33,8 +33,8 @@ class App(QApplication):
         self.__layout.setContentsMargins(7, 7, 7, 7)
         self.__layout.setSpacing(7)
         
-        self.__layout.addWidget(self.__home_frame)
-        self.set_main_frame(self.__test)
+        self.__layout.addWidget(self.__side_panel)
+        self.set_main_frame(self.__home_frame)
         
         self.__top_frame.setLayout(self.__layout)
         

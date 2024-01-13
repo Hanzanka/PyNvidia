@@ -1,4 +1,4 @@
-from PyQt6.QtWidgets import QApplication, QHBoxLayout, QWidget, QFrame
+from PyQt6.QtWidgets import QApplication, QHBoxLayout, QFrame
 from PyQt6.QtGui import QIcon, QPalette, QColor
 from src.ui_qt.side_panel import SidePanel
 from src.ui_qt.home_frame import HomeFrame

@@ -9,8 +9,8 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import Qt, QThread, QSize, QPropertyAnimation
 from PyQt6.QtGui import QFont, QMovie
-from src.driver_manager.driver_manager import NvidiaDriverManager
-from src.utils.utils import get_path
+from driver_manager.driver_manager import NvidiaDriverManager
+from utils.utils import get_path
 
 
 class UpdateFrame(QFrame):

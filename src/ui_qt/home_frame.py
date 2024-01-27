@@ -1,10 +1,10 @@
 from PyQt6.QtWidgets import QFrame, QLabel, QVBoxLayout
-from src.gpu.gpu import GPU
+from gpu.gpu import GPU
 from PyQt6.QtGui import QFont
 from PyQt6.QtCore import Qt
-from src.ui_qt.update_frame import UpdateFrame
-from src.ui_qt.monitor_frame import MonitorFrame
-from src.driver_manager.driver_manager import NvidiaDriverManager
+from ui_qt.update_frame import UpdateFrame
+from ui_qt.monitor_frame import MonitorFrame
+from driver_manager.driver_manager import NvidiaDriverManager
 
 
 class HomeFrame(QFrame):

@@ -1,6 +1,7 @@
 from PyQt6.QtWidgets import QFrame, QPushButton, QVBoxLayout, QLabel, QSizePolicy
 from PyQt6.QtCore import Qt
 from PyQt6.QtGui import QFont
+from PyQt6.QtWidgets import QApplication
 
 
 class SidePanel(QFrame):
@@ -25,6 +26,7 @@ class SidePanel(QFrame):
         self.__home_button.setStyleSheet(
             "QPushButton {background-color: #76b900} QPushButton:hover{background-color: #91c733} QPushButton:pressed {background-color: #76b900}"
         )
+        self.__home_button.clicked.connect(QApplication.instance().home)
         self.__layout.addWidget(self.__home_button)
 
         self.__settings_button = QPushButton(text="Settings")

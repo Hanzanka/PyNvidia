@@ -1,8 +1,10 @@
-from ui.app import App
-from scraper.scraper import NvidiaWebScraper
-from gpu.gpu import GPU
+from ui_qt.app import App
+# from pyuac import isUserAdmin, runAsAdmin
+# import sys
 
+# if not isUserAdmin():
+#     runAsAdmin(showCmd=True)
+# else:
+#     app = App(argv=[])
 
-driver_downloader = NvidiaWebScraper(gpu=GPU())
-app = App(driver_downloader=driver_downloader)
-app.mainloop()
+app = App(argv=[])

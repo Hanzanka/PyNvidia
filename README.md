@@ -2,44 +2,26 @@
 # PyNvidia
 This repository provides a comprehensive solution for managing NVIDIA GPU drivers. It includes a utility for updating NVIDIA GPU drivers to their latest versions via easy to use user-interface.
 
-In addition, it features a monitoring system that keeps track of the state of your NVIDIA GPU. This includes monitoring GPU temperature, memory usage, clock speed, and more. Please note that the monitoring is currently real-time only and does not support logging or retrieving past data.
+In addition, it features a monitoring system that keeps track of the state of your NVIDIA GPU. This includes monitoring GPU temperature, memory usage, clock speed, and more.
 
 ## Features
 - Driver Updates: Automatically updates NVIDIA GPU drivers to the latest version.
 - GPU Monitoring: Real-time monitoring of GPU state.
 
 ## UI
-### Note
-The UI will be remaked with PyQT instead of Tkinter.
 ### Home Screen
 - Driver Updates: Automatically update your with a few clicks.
 - GPU Monitoring: Display GPU statistics in real-time.
 
 ![Home Screen](https://github.com/Hanzanka/PyNvidia/blob/main/homescreen.png?raw=true)
+### Graph View
+- GPU Monitoring: View GPU sensor values in real-time updating graph.
+
+![Graph View](https://github.com/Hanzanka/PyNvidia/blob/main/graphview.png?raw=true)
 
 ## Dependencies
-- [CustomTkinter](https://github.com/tomschimansky/customtkinter)
-- Tkinter
-- [Selenium](https://pypi.org/project/selenium/)
+- [PyQt6](https://pypi.org/project/PyQt6/)
+- [pyqtgraph](https://pypi.org/project/pyqtgraph/)
+- [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
 - [pyuac](https://pypi.org/project/pyuac/)
 - [Fira Code](https://fonts.google.com/specimen/Fira+Code)(Probably will be changed or to be automatically installed with the program)
-
-
-## Installation
-The repository is in early development, so the program wouldn't work by directly cloning the repository. However if you still want to get it work, here is the steps to get it work:
-
-1. Clone the repository
-```bash
-git clone https://github.com/Hanzanka/PyNvidia.git
-```
-2. Create a config.json -file to `src/`
-
-3. Add these lines to config.json:
-```json
-{
-    "paths": {
-        "program": "(path to where the repository cloned)",
-        "download": "(path to where the driver files are downloaded)"
-    }
-}
-```

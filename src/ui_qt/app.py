@@ -1,9 +1,9 @@
 from PyQt6.QtWidgets import QApplication, QHBoxLayout, QFrame
 from PyQt6.QtGui import QIcon, QPalette, QColor
-from src.ui_qt.side_panel import SidePanel
-from src.ui_qt.home_frame import HomeFrame
-from src.utils.utils import get_path
-from src.ui_qt.gpu_chart_frame import GPUChartFrame
+from ui_qt.side_panel import SidePanel
+from ui_qt.home_frame import HomeFrame
+from utils.utils import get_path
+from PyQt6.QtCore import pyqtSlot
 
 
 class App(QApplication):
@@ -24,8 +24,6 @@ class App(QApplication):
         self.__side_panel = SidePanel()
         self.__home_frame = HomeFrame()
         
-        self.__test = GPUChartFrame()
-        
         self.__main_frame = None
         self.__main_return_to = None
 
@@ -42,10 +40,18 @@ class App(QApplication):
         
         self.exec()
 
+    @pyqtSlot(QFrame)
     def set_main_frame(self, frame: QFrame) -> None:
         if self.__main_frame is not None:
             self.__main_return_to = self.__main_frame
             self.__layout.removeWidget(self.__main_frame)
             self.__main_frame.setParent(None)
         self.__main_frame = frame
+        self.__layout.addWidget(self.__main_frame)
+    
+    @pyqtSlot()
+    def home(self) -> None:
+        self.__layout.removeWidget(self.__main_frame)
+        self.__main_frame.setParent(None)
+        self.__main_frame = self.__home_frame
         self.__layout.addWidget(self.__main_frame)

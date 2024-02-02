@@ -32,32 +32,6 @@ def locate_7zip() -> str:
         json.dump(config, config_file, indent=4)
 
 
-def extract_files() -> None:
-    import os
-    import subprocess
-
-    download_path = get_path("download")
-    sevenz_path = get_path("sevenz")
-
-    folder_path = download_path + str(
-        max([float(os.path.splitext(file)[0]) for file in os.listdir(download_path)])
-    )
-    driver_path = folder_path + ".exe"
-
-    subprocess.run(
-        args=[
-            sevenz_path,
-            "x",
-            driver_path,
-            "-aoa",
-            "-bso0",
-            "-bsp0",
-            f"-o{folder_path}",
-        ]
-    )
-    os.remove(driver_path)
-
-
 def get_path(key: str) -> str:
     import json
     import pathlib
@@ -66,24 +40,3 @@ def get_path(key: str) -> str:
         str(pathlib.Path(__file__).parents[1]) + "/config.json", "r"
     ) as config_file:
         return json.load(config_file)["paths"][key]
-
-
-def install_driver(driver_version: str) -> None:
-    import subprocess
-
-    try:
-        subprocess.Popen(
-            args=[
-                f"{get_path('download')}{driver_version}/setup.exe",
-                "Display.Driver",
-                "Display.PhysX",
-                "HDAudio.Driver",
-                "-s",
-            ]
-        )
-    except Exception:
-        pass
-
-
-if __name__ == "__main__":
-    locate_7zip()

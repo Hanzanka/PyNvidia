@@ -165,3 +165,5 @@ options.py
 .tmp.drivedownload/
 .VSCODECounter/
 .vscode/
+.temp/
+config.json

@@ -36,7 +36,7 @@ class UpdateFrame(QFrame):
 
         self.__feedback_label = QLabel(text="")
         self.__feedback_label.setFixedHeight(20)
-        self.__feedback_label.setStyleSheet("color: white; border")
+        self.__feedback_label.setStyleSheet("color: white;")
         self.__feedback_label.setFont(font)
         self.__feedback_layout.addWidget(self.__feedback_label)
 
@@ -137,7 +137,7 @@ class UpdateFrame(QFrame):
         self.__driver_manager_thread.start()
 
     def __check_for_update_complete(
-        self, update_available: bool, available_driver_version: float
+        self, update_available: bool, available_driver_version: float, skip_download: float
     ) -> None:
         self.__driver_manager.check_for_update_signal.disconnect(
             self.__check_for_update_complete
@@ -163,6 +163,17 @@ class UpdateFrame(QFrame):
                 Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignBottom,
             )
             self.__check_update_button.setEnabled(True)
+
+        elif skip_download:
+            self.__feedback_label.setAlignment(
+                Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignLeft
+            )
+
+            self.__feedback_label.setText("Driver Is Ready To Be Installed")
+            self.__main_layout.addLayout(
+                self.__feedback_layout, 0, 0, Qt.AlignmentFlag.AlignBottom
+            )
+            self.__main_layout.addWidget(self.__install_button, 1, 0)
 
         else:
             self.__feedback_label.setText(

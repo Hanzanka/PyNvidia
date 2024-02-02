@@ -1,21 +1,29 @@
 from urllib.request import urlretrieve, urlopen
-from src.gpu.gpu import GPU
-import os
-from src.utils.utils import get_path, extract_driver
+from gpu.gpu import GPU
+from utils.utils import get_path
 from PyQt6.QtCore import pyqtSignal, pyqtSlot, QObject
 from threading import Lock, Timer
-from src.utils.utils import delete_unfinished_download, get_nv_search_keys
 from bs4 import BeautifulSoup
 from datetime import datetime
+import os
+import subprocess
+import pathlib
+import json
 
 
-class NvidiaWebScraper(QObject):
-    check_for_update_signal = pyqtSignal(bool, float)
+class NvidiaDriverManager(QObject):
+    check_for_update_signal = pyqtSignal(bool, float, float)
     check_for_update_error_signal = pyqtSignal()
 
     download_signal = pyqtSignal(int, float, float, float)
     download_error_signal = pyqtSignal()
     download_complete_signal = pyqtSignal(bool)
+
+    extract_error_signal = pyqtSignal()
+    extract_complete_signal = pyqtSignal()
+
+    install_error_signal = pyqtSignal()
+    install_complete_signal = pyqtSignal()
 
     def __init__(self, gpu: GPU) -> None:
         super().__init__()
@@ -27,7 +35,7 @@ class NvidiaWebScraper(QObject):
         self.__last_size = 0
 
     def __get_driver_url(self) -> str:
-        keys = get_nv_search_keys(
+        keys = self.__get_nv_search_keys(
             product_series=self.__gpu.series, product=self.__gpu.product
         )
         url = (
@@ -57,6 +65,7 @@ class NvidiaWebScraper(QObject):
         self.check_for_update_signal.emit(
             self.__gpu.driver_version != self.__available_driver_version,
             self.__available_driver_version,
+            self.__installer_exists()
         )
 
     @pyqtSlot()
@@ -76,11 +85,12 @@ class NvidiaWebScraper(QObject):
                 filename=download_location,
                 reporthook=self.__update_download_progress,
             )
+
         except Exception:
             self.download_error_signal.emit()
-            delete_unfinished_download(driver_version=self.__available_driver_version)
+            self.__delete_unfinished_download()
             return
-        self.download_complete_signal.emit()
+        self.download_complete_signal.emit(False)
 
     def __update_download_progress(self, block_num, block_size, total_size) -> None:
         if self.__report_lock.acquire(blocking=False):
@@ -96,7 +106,7 @@ class NvidiaWebScraper(QObject):
             )
             self.__last_update = time_now
             self.__last_size = size_now
-            Timer(interval=0.5, function=self.__report_lock.release).start()
+            Timer(interval=1, function=self.__report_lock.release).start()
 
         if block_num * block_size >= total_size:
             self.download_signal.emit(
@@ -106,12 +116,69 @@ class NvidiaWebScraper(QObject):
                 0,
             )
             self.download_complete_signal.emit(True)
-    
-    def extract_driver(self) -> None:
+
+    def __get_nv_search_keys(self, product_series: str, product: str) -> tuple:
+        config_path = (
+            str(pathlib.Path(__file__).parents[2]) + "/resources/nv_search_keys.json"
+        )
+        with open(config_path, "r") as config_file:
+            nv_search_keys = json.load(config_file)
+            return (
+                nv_search_keys["product_series"][product_series],
+                nv_search_keys["product_type"][product],
+            )
+
+    @pyqtSlot()
+    def extract_driver_package(self) -> None:
+        sevenz_path = get_path("sevenz")
+
+        folder_path = self.__download_path + str(
+            max(
+                [float(os.path.splitext(file)[0]) for file in os.listdir(self.__download_path)]
+            )
+        )
+        driver_path = folder_path + ".exe"
+
+        if not os.path.exists(folder_path):
+            try:
+                subprocess.run(
+                    args=[
+                        sevenz_path,
+                        "x",
+                        driver_path,
+                        "-aoa",
+                        "-bso0",
+                        "-bsp0",
+                        f"-o{folder_path}",
+                    ]
+                )
+            except Exception:
+                self.extract_error_signal.emit()
+
+        os.remove(driver_path)
+        self.extract_complete_signal.emit()
+
+    def __delete_unfinished_download(self) -> None:
         try:
-            
+            os.remove(f"{get_path('download')}{self.__available_driver_version}.exe")
+        except Exception:
+            pass
 
+    def __installer_exists(self) -> bool:
+        return pathlib.Path(self.__download_path + str(self.__available_driver_version)).is_dir()
 
-if __name__ == "__main__":
-    gpu = GPU(laptop_dev=True)
-    scraper = NvidiaWebScraper(gpu=gpu)
+    @pyqtSlot()
+    def install_driver(self) -> None:
+        try:
+            subprocess.run(
+                args=[
+                    f"{get_path('download')}{self.__available_driver_version}/setup.exe",
+                    "Display.Driver",
+                    "HDAudio.Driver",
+                    "-s",
+                ]
+            )
+        except Exception:
+            self.install_error_signal.emit()
+        
+        self.install_complete_signal.emit()

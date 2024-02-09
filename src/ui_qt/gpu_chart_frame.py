@@ -8,8 +8,15 @@ import numpy as np
 
 class GPUChartFrame(QFrame):
     update_signal = pyqtSignal(object)
-    
-    def __init__(self, title: str, title_y_axis: str, unit: str, y_max: int | float, data_property_id: str) -> None:
+
+    def __init__(
+        self,
+        title: str,
+        title_y_axis: str,
+        unit: str,
+        y_max: int | float,
+        data_property_id: str,
+    ) -> None:
         super().__init__()
         self.setStyleSheet(
             "background-color: #0b0b0b; border-radius: 5px; border-width: 0px"
@@ -30,10 +37,11 @@ class GPUChartFrame(QFrame):
         self.__graph.setBackground("#0b0b0b")
 
         self.__plot = self.__graph.addPlot()
-        self.__plot.setTitle(title, color="white")
+        self.__plot.setTitle("Based", color="white")
         self.__plot.titleLabel.item.setFont(font)
         self.__plot.getViewBox().setBackgroundColor("#0b0b0b")
         self.__plot.setRange(xRange=(0, 100), yRange=(0, y_max))
+        self.__plot.getViewBox().invertX(True)
         self.__plot.setMenuEnabled(False)
         self.__plot.setMouseEnabled(x=False, y=False)
         self.__plot.hideButtons()
@@ -44,10 +52,10 @@ class GPUChartFrame(QFrame):
         bottom_axis.setTickFont(font)
         bottom_axis.setPen(pen)
         bottom_axis.setTextPen(pen)
-        ticks = np.arange(0, 110, 20)
-        bottom_axis.setTicks([[(tick, str(abs(tick - 100))) for tick in ticks]])
+        ticks = np.arange(100, -1, -10)
+        bottom_axis.setTicks([[(tick, str(tick)) for tick in ticks]])
 
-        self.__plot.setLabel("left", f"{title_y_axis}({self.__unit})")
+        self.__plot.setLabel("left", f"{title} ({self.__unit})")
         left_axis = self.__plot.getAxis("left")
         left_axis.label.setFont(font)
         left_axis.setTickFont(font)
@@ -89,21 +97,22 @@ class GPUChartFrame(QFrame):
         self.__x_value.setZValue(1)
         self.__plot.addItem(self.__x_value, ignoreBounds=True)
 
-        self.__x_data = np.array([x for x in range(101)])
-        self.__y_data = np.zeros(101)
-        
-        self.__x_times = np.zeros(101, dtype="U8")
-        
-        self.__curve = self.__plot.plot(self.__x_data, self.__y_data, pen=self.__curve_pen)
-        
+        self.__x_data = np.array([])
+        self.__y_data = np.array([])
+        self.__x_times = np.zeros([], dtype="U8")
+
+        self.__curve = self.__plot.plot(
+            self.__x_data, self.__y_data, pen=self.__curve_pen
+        )
+
         self.__proxy = QGraph.SignalProxy(
             self.__plot.scene().sigMouseMoved, rateLimit=60, slot=self.__mouse_moved
         )
 
         self.__layout.addWidget(self.__graph)
         self.setLayout(self.__layout)
-        
-        self.update_signal.connect(self.__update_chart)
+
+        self.update_signal.connect(self.__update_data)
 
     @property
     def data_property_id(self) -> str:
@@ -124,18 +133,37 @@ class GPUChartFrame(QFrame):
             self.__x_value.setPos(nearest_x, 0)
 
     @pyqtSlot(object)
-    def __update_chart(self, value) -> None:
+    def __update_data(self, value) -> None:
         time = value[1]
         value = value[0]
+
+        if len(self.__y_data) == 101:
+            self.__y_data = np.roll(self.__y_data, 1)
+            self.__y_data[0] = value
+            self.__x_times = np.roll(self.__x_times, 1)
+            self.__x_times[0] = time
+
+        elif len(self.__y_data) != 0:
+            self.__y_data = np.insert(self.__y_data, 0, value)
+            self.__x_data = np.append(self.__x_data, self.__x_data[-1] + 1)
+            self.__x_times = np.insert(self.__x_times, 0, time)
         
-        self.__y_data = np.roll(self.__y_data, -1)
-        self.__y_data[-1] = value
-        self.__x_times = np.roll(self.__x_times, -1)
-        self.__x_times[-1] = time
+        else:
+            self.__x_data = np.array([0])
+            self.__y_data = np.array([value])
+            self.__x_times = np.array([time], dtype="U8")
 
         self.__curve.setData(self.__x_data, self.__y_data)
-        
+
         line_pos = self.__examine_line.getPos()[0]
         self.__y_value.setText(f"{self.__y_data[line_pos]}{self.__unit}")
         self.__y_value.setPos(line_pos, self.__y_data[line_pos])
         self.__x_value.setText(f"{self.__x_times[line_pos]}")
+
+        self.__plot.setTitle(
+            f"Current: {value}{self.__unit} | "
+            + f"Min: {self.__y_data.min()}{self.__unit} | "
+            + f"Max: {self.__y_data.max()}{self.__unit} | "
+            + f"Avg: {np.average(self.__y_data):.1f}{self.__unit}",
+            color="white",
+        )

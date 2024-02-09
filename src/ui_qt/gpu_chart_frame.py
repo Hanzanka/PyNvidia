@@ -12,7 +12,6 @@ class GPUChartFrame(QFrame):
     def __init__(
         self,
         title: str,
-        title_y_axis: str,
         unit: str,
         y_max: int | float,
         data_property_id: str,

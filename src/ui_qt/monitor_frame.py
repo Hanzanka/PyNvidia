@@ -49,7 +49,6 @@ class MonitorFrame(QFrame):
         self.__updater.add_widget(self.__util)
         self.__util_chart = GPUChartFrame(
             title="Utilization",
-            title_y_axis="Percentage",
             unit="%",
             y_max=100,
             data_property_id="utilization"
@@ -69,7 +68,6 @@ class MonitorFrame(QFrame):
         self.__updater.add_widget(self.__temp)
         self.__temp_chart = GPUChartFrame(
             title="Temperature",
-            title_y_axis="Celsius",
             unit="°C",
             y_max=self.__gpu.target_temperature,
             data_property_id="temperature"
@@ -88,8 +86,7 @@ class MonitorFrame(QFrame):
         self.__layout.addWidget(self.__clock, 2, 0)
         self.__updater.add_widget(self.__clock)
         self.__clock_chart = GPUChartFrame(
-            title="Core Glock",
-            title_y_axis="Megahertz",
+            title="Core Clock",
             unit="MHz",
             y_max=self.__gpu.max_graphics_clock,
             data_property_id="clock",
@@ -109,7 +106,6 @@ class MonitorFrame(QFrame):
         self.__updater.add_widget(self.__vram)
         self.__vram_chart = GPUChartFrame(
             title="VRAM",
-            title_y_axis="Gigabyte",
             unit="GB",
             y_max=self.__gpu.vram_gb,
             data_property_id="vram_gb",
@@ -126,7 +122,6 @@ class MonitorFrame(QFrame):
         self.__updater.add_widget(self.__fan)
         self.__fan_chart = GPUChartFrame(
             title="Fan Speed",
-            title_y_axis="Percentage",
             unit="%",
             y_max=100,
             data_property_id="fan",
@@ -146,7 +141,6 @@ class MonitorFrame(QFrame):
         self.__layout.addWidget(self.__power, 3, 1)
         self.__power_chart = GPUChartFrame(
             title="Power",
-            title_y_axis="Watt",
             unit="W",
             y_max=self.__gpu.power_limit,
             data_property_id="power",

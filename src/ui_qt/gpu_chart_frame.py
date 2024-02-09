@@ -53,7 +53,21 @@ class GPUChartFrame(QFrame):
         left_axis.setTickFont(font)
         left_axis.setPen(pen)
         left_axis.setTextPen(pen)
-        ticks = np.arange(0, y_max + 10, 10)
+        if y_max < 20:
+            tick_range = 1
+        elif 20 < y_max and y_max < 40:
+            tick_range = 5
+        elif 40 < y_max and y_max < 200:
+            tick_range = 10
+        elif 200 < y_max and y_max < 400:
+            tick_range = 20
+        elif 400 < y_max and y_max < 1000:
+            tick_range = 50
+        elif 1000 < y_max and y_max < 2000:
+            tick_range = 100
+        else:
+            tick_range = 200
+        ticks = np.arange(0, y_max + 10, tick_range)
         left_axis.setTicks([[(tick, str(tick)) for tick in ticks]])
 
         self.__examine_line = QGraph.InfiniteLine(

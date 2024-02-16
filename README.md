@@ -23,5 +23,6 @@ In addition, it features a monitoring system that keeps track of the state of yo
 - [PyQt6](https://pypi.org/project/PyQt6/)
 - [pyqtgraph](https://pypi.org/project/pyqtgraph/)
 - [beautifulsoup4](https://pypi.org/project/beautifulsoup4/)
+- [pynvml](https://pypi.org/project/pynvml/)
 - [pyuac](https://pypi.org/project/pyuac/)
 - [Fira Code](https://fonts.google.com/specimen/Fira+Code)(Probably will be changed or to be automatically installed with the program)

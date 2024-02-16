@@ -45,7 +45,7 @@ class GPUChartFrame(QFrame):
         self.__plot.setMouseEnabled(x=False, y=False)
         self.__plot.hideButtons()
 
-        self.__plot.setLabel("bottom", "Time(s)")
+        self.__plot.setLabel("bottom", "Last 100 Seconds")
         bottom_axis = self.__plot.getAxis("bottom")
         bottom_axis.label.setFont(font)
         bottom_axis.setTickFont(font)

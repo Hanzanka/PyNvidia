@@ -62,6 +62,7 @@ class UpdateFrame(QFrame):
             + " QPushButton:hover{background-color: #91c733}"
             + " QPushButton:pressed {background-color: #76b900}"
         )
+        self.__check_update_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.__check_update_button.setFont(font)
         self.__check_update_button.setFixedSize(140, 30)
         self.__main_layout.addWidget(
@@ -84,6 +85,7 @@ class UpdateFrame(QFrame):
         self.__download_button.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
         )
+        self.__download_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.__download_button.setFont(font)
         self.__download_button.clicked.connect(self.__download_button_click)
 
@@ -97,6 +99,7 @@ class UpdateFrame(QFrame):
         self.__install_button.setSizePolicy(
             QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
         )
+        self.__install_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.__install_button.setFont(font)
         self.__install_button.clicked.connect(self.__install_button_click)
 

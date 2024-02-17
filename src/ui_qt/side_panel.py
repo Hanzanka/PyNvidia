@@ -21,7 +21,10 @@ class SidePanel(QFrame):
 
         self.__home_button = QPushButton(text="Home")
         self.__home_button.setFixedHeight(30)
-        self.__home_button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.__home_button.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
+        self.__home_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.__home_button.setFont(font)
         self.__home_button.setStyleSheet(
             "QPushButton {background-color: #76b900} QPushButton:hover{background-color: #91c733} QPushButton:pressed {background-color: #76b900}"
@@ -31,7 +34,10 @@ class SidePanel(QFrame):
 
         self.__settings_button = QPushButton(text="Settings")
         self.__settings_button.setFixedHeight(30)
-        self.__settings_button.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.__settings_button.setSizePolicy(
+            QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed
+        )
+        self.__settings_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.__settings_button.setFont(font)
         self.__settings_button.setStyleSheet(
             "QPushButton {background-color: #76b900} QPushButton:hover{background-color: #91c733} QPushButton:pressed {background-color: #76b900}"

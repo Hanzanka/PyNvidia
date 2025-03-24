@@ -27,7 +27,7 @@ class SidePanel(QFrame):
         self.__home_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.__home_button.setFont(font)
         self.__home_button.setStyleSheet(
-            "QPushButton {background-color: #76b900} QPushButton:hover{background-color: #91c733} QPushButton:pressed {background-color: #76b900}"
+            "QPushButton {background-color: #76b900; color: #0b0b0b} QPushButton:hover{background-color: #91c733} QPushButton:pressed {background-color: #76b900}"
         )
         self.__home_button.clicked.connect(QApplication.instance().home)
         self.__layout.addWidget(self.__home_button)
@@ -40,7 +40,7 @@ class SidePanel(QFrame):
         self.__settings_button.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         self.__settings_button.setFont(font)
         self.__settings_button.setStyleSheet(
-            "QPushButton {background-color: #76b900} QPushButton:hover{background-color: #91c733} QPushButton:pressed {background-color: #76b900}"
+            "QPushButton {background-color: #76b900; color: #0b0b0b} QPushButton:hover{background-color: #91c733} QPushButton:pressed {background-color: #76b900}"
         )
         self.__layout.addWidget(self.__settings_button)
 

@@ -14,7 +14,7 @@ class HomeFrame(QFrame):
             "background-color: #0b0b0b; border-radius: 5px; border-width: 0px"
         )
 
-        self.__gpu = GPU(laptop_dev=False)
+        self.__gpu = GPU()
         self.__driver_manager = NvidiaDriverManager(self.__gpu)
 
         self.__layout = QVBoxLayout()

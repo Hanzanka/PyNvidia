@@ -58,7 +58,7 @@ class UpdateFrame(QFrame):
 
         self.__check_update_button = QPushButton(text="Check For Updates")
         self.__check_update_button.setStyleSheet(
-            "QPushButton {background-color: #76b900; border-radius: 5px}"
+            "QPushButton {background-color: #76b900; border-radius: 5px; color: #0b0b0b}"
             + " QPushButton:hover{background-color: #91c733}"
             + " QPushButton:pressed {background-color: #76b900}"
         )
@@ -77,7 +77,7 @@ class UpdateFrame(QFrame):
 
         self.__download_button = QPushButton(text="Download Update")
         self.__download_button.setStyleSheet(
-            "QPushButton {background-color: #76b900; border-radius: 5px}"
+            "QPushButton {background-color: #76b900; border-radius: 5px; color: #0b0b0b}"
             + " QPushButton:hover{background-color: #91c733}"
             + " QPushButton:pressed {background-color: #76b900}"
         )
@@ -91,7 +91,7 @@ class UpdateFrame(QFrame):
 
         self.__install_button = QPushButton(text="Install Driver")
         self.__install_button.setStyleSheet(
-            "QPushButton {background-color: #76b900; border-radius: 5px}"
+            "QPushButton {background-color: #76b900; border-radius: 5px; color: #0b0b0b}"
             + " QPushButton:hover{background-color: #91c733}"
             + " QPushButton:pressed {background-color: #76b900}"
         )

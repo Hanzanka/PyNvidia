@@ -3,7 +3,6 @@ from gpu.gpu import GPU
 from utils.utils import get_path
 from PyQt6.QtCore import pyqtSignal, pyqtSlot, QObject
 from threading import Lock, Timer
-from bs4 import BeautifulSoup
 from datetime import datetime
 import os
 import subprocess
@@ -29,12 +28,13 @@ class NvidiaDriverManager(QObject):
         super().__init__()
         self.__gpu = gpu
         self.__download_path = get_path("download")
-        self.__available_driver_version = None
+        self.__available_driver_version_str = None
+        self.__available_driver_version_float = None
         self.__report_lock = Lock()
         self.__last_update = datetime.now()
         self.__last_size = 0
 
-    def __get_driver_url(self) -> str:
+    def __get_driver_id(self) -> str:
         keys = self.__get_nv_search_keys(
             product_series=self.__gpu.series, product=self.__gpu.product
         )
@@ -50,22 +50,37 @@ class NvidiaDriverManager(QObject):
             + "&dtid=1"
             + "&dtcid=1"
         )
-        return f"https://www.nvidia.com/download/{urlopen(f'https://www.nvidia.com/download/{url}').read().decode()}"
+        return (
+            urlopen(f"https://www.nvidia.com/download/{url}")
+            .read()
+            .decode()
+            .split("/")[1]
+        )
 
     @pyqtSlot()
     def check_for_updates(self) -> None:
         try:
-            page = urlopen(self.__get_driver_url()).read().decode()
+            page = json.loads(
+                (
+                    urlopen(
+                        f"https://www.nvidia.com/services/com.nvidia.services/AEMDriversContent/getDownloadDetails?{{%22ddID%22:%22{self.__get_driver_id()}%22}}"
+                    )
+                    .read()
+                    .decode()
+                )
+            )
         except Exception:
             self.check_for_update_error_signal.emit()
             return
-        soup = BeautifulSoup(page, "html.parser")
-        td = soup.find("td", {"id": "tdVersion"})
-        self.__available_driver_version = float(td.text.split()[0])
+
+        self.__available_driver_version_str = page["driverDetails"]["IDS"][0][
+            "downloadInfo"
+        ]["Version"]
+        self.__available_driver_version = float(self.__available_driver_version_str)
         self.check_for_update_signal.emit(
             self.__gpu.driver_version != self.__available_driver_version,
             self.__available_driver_version,
-            self.__installer_exists()
+            self.__installer_exists(),
         )
 
     @pyqtSlot()
@@ -78,9 +93,9 @@ class NvidiaDriverManager(QObject):
             )
             urlretrieve(
                 url="https://us.download.nvidia.com/Windows/"
-                + str(self.__available_driver_version)
+                + self.__available_driver_version_str
                 + "/"
-                + str(self.__available_driver_version)
+                + self.__available_driver_version_str
                 + "-desktop-win10-win11-64bit-international-dch-whql.exe",
                 filename=download_location,
                 reporthook=self.__update_download_progress,
@@ -134,7 +149,10 @@ class NvidiaDriverManager(QObject):
 
         folder_path = self.__download_path + str(
             max(
-                [float(os.path.splitext(file)[0]) for file in os.listdir(self.__download_path)]
+                [
+                    float(os.path.splitext(file)[0])
+                    for file in os.listdir(self.__download_path)
+                ]
             )
         )
         driver_path = folder_path + ".exe"
@@ -165,7 +183,9 @@ class NvidiaDriverManager(QObject):
             pass
 
     def __installer_exists(self) -> bool:
-        return pathlib.Path(self.__download_path + str(self.__available_driver_version)).is_dir()
+        return pathlib.Path(
+            self.__download_path + str(self.__available_driver_version)
+        ).is_dir()
 
     @pyqtSlot()
     def install_driver(self) -> None:
@@ -173,12 +193,12 @@ class NvidiaDriverManager(QObject):
             subprocess.run(
                 args=[
                     f"{get_path('download')}{self.__available_driver_version}/setup.exe",
+                    "-s",
                     "Display.Driver",
                     "HDAudio.Driver",
-                    "-s",
                 ]
             )
         except Exception:
             self.install_error_signal.emit()
-        
+
         self.install_complete_signal.emit()

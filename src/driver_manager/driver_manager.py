@@ -8,6 +8,7 @@ import os
 import subprocess
 import pathlib
 import json
+import re
 
 
 class NvidiaDriverManager(QObject):
@@ -50,12 +51,9 @@ class NvidiaDriverManager(QObject):
             + "&dtid=1"
             + "&dtcid=1"
         )
-        return (
-            urlopen(f"https://www.nvidia.com/download/{url}")
-            .read()
-            .decode()
-            .split("/")[1]
-        )
+        return re.search(
+            r"\d+", urlopen(f"https://www.nvidia.com/download/{url}").read().decode()
+        ).group()
 
     @pyqtSlot()
     def check_for_updates(self) -> None:
@@ -72,7 +70,6 @@ class NvidiaDriverManager(QObject):
         except Exception:
             self.check_for_update_error_signal.emit()
             return
-
         self.__available_driver_version_str = page["driverDetails"]["IDS"][0][
             "downloadInfo"
         ]["Version"]

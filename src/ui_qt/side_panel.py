@@ -42,7 +42,7 @@ class SidePanel(QFrame):
         self.__settings_button.setStyleSheet(
             "QPushButton {background-color: #76b900; color: #0b0b0b} QPushButton:hover{background-color: #91c733} QPushButton:pressed {background-color: #76b900}"
         )
-        self.__layout.addWidget(self.__settings_button)
+        #self.__layout.addWidget(self.__settings_button)
 
         self.__layout.addStretch()
 
